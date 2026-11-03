@@ -7,13 +7,9 @@ charcoal-blue chassis, white headline values, muted gray labels, and one
 saturated accent per data domain. No bitmap assets, no stylesheets on
 instrument surfaces, one executable.
 
-Use **"Use this template"**, then make it yours in two commands:
-
-```bash
-scripts/rename-project.sh FleetConsole    # rebrand + self-verifying build
-# implement your data source in src/FeedService.cpp::pollSite() — one
-# function, fully documented (docs/recipes.md "Wire a feed")
-```
+Two ways to start a project from this template — the GitHub button or a
+plain git clone — both in [Start a project](#start-a-project-from-this-template)
+below. Then one function (the feed seam) makes it yours.
 
 ![screenshot](screenshot.png)
 
@@ -22,6 +18,69 @@ intentionally unwired, so every site renders its explicit gap
 ("AWAITING FIRST SCAN" — gaps shown, never faked) until you wire a source.
 The scan cycle, countdown, link semantics, alerting and admin UI are all
 live.
+
+## Start a project from this template
+
+### Option A — GitHub's "Use this template" (instantiated on GitHub)
+
+Open the repository on GitHub and click **Use this template → Create a new
+repository**, or do it from the terminal:
+
+```bash
+gh repo create my-app --template tonisoueid/dashboard-template-qt-cpp --public --clone
+```
+
+Either way GitHub creates a **new repository under your account with a
+single fresh commit** — no shared history with the template. Then rebrand
+the app inside:
+
+```bash
+cd my-app
+./scripts/rename-project.sh MyApp        # rebrand + self-verifying build
+git add -A && git commit -m "Rebrand template to MyApp"
+git push
+```
+
+### Option B — clone, rename, push (git-native)
+
+```bash
+# 1. Clone the template under your project's name.
+git clone https://github.com/tonisoueid/dashboard-template-qt-cpp.git my-app
+cd my-app
+
+# 2. Optional: start from a clean single commit instead of the template's
+#    history (plain clones carry it; GitHub's "Use this template" does not).
+rm -rf .git && git init -b main
+git add -A && git commit -m "Initial commit"
+
+# 3. Rebrand the app — rewrites the identity tokens everywhere (CMake
+#    project/target, window title, .desktop, icon name, packaging and
+#    Docker image names), renames the .desktop file, then rebuilds and
+#    runs an offscreen grab so a broken rename never lands silently.
+./scripts/rename-project.sh MyApp        # names may start with a digit
+git add -A && git commit -m "Rebrand template to MyApp"
+
+# 4. Create the GitHub repository and push.
+gh repo create my-app --public --source . --push
+#    Without gh: create an empty repo on github.com (no README), then
+#    git remote set-url origin https://github.com/<you>/my-app.git
+#    git push -u origin main
+```
+
+Notes:
+
+- The rename script changes the **application identity**, not the GitHub
+  repo — the repo name is whatever you cloned into / created. Pick your
+  app's name at step 1 (or rename the repo later in Settings).
+- Don't **fork** the template instead: forks carry the full history, get a
+  "forked from" label, and forks of public repos can't be private.
+
+### Then: wire your feed
+
+The template boots with an intentionally unwired feed — sites render their
+explicit gap state until a source exists. Implementing it is one function,
+`src/FeedService.cpp::pollSite()`, fully documented with a worked example
+in [docs/recipes.md](docs/recipes.md) "Wire a feed".
 
 ## What you get
 
